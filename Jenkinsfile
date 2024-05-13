@@ -47,7 +47,7 @@ pipeline{
         stage("Docker Push"){
             steps{
                 script{
-                    bat 'docker push abhishekvanaras/user-service-ms:1.4'
+                    bat 'docker push abhishekvanaras/user-service:1.4'
                 }
             }
         }
