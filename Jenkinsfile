@@ -21,9 +21,34 @@ pipeline{
                 }
             }
         }
-        stage("Deploy to Container"){
+        stage("Build Docker Image"){
             steps{
-                deploy adapters: [tomcat9(credentialsId: 'tomcat2', path: '', url: 'http://localhost:8181/')], contextPath: 'user-service-ms', war: '**/*.war'
+                script{
+                    bat 'docker build -t user-service-ms:1.2 .'
+                }
+            }
+        }
+        stage("Tag the Image"){
+            steps{
+                script{
+                    bat 'docker tag user-service-ms:1.2 abhishekvanaras/user-service:1.4'
+                }
+            }
+        }
+        stage("Docker Login"){
+            steps{
+                script{
+                   withCredentials([string(credentialsId: '238f4a00-e40f-4dc9-8a11-917560fe2704', variable: 'dockerCredential')]) {
+                   bat 'docker login -u abhishekvanaras -p dockerCredential'
+                   }
+                }
+            }
+        }
+        stage("Docker Push"){
+            steps{
+                script{
+                    bat 'docker push abhishekvanaras/user-service-ms:1.4'
+                }
             }
         }
 
