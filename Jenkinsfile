@@ -38,8 +38,8 @@ pipeline{
         stage("Docker Login"){
             steps{
                 script{
-                   withCredentials([string(credentialsId: '238f4a00-e40f-4dc9-8a11-917560fe2704', variable: 'dockerCredential')]) {
-                   bat 'docker login -u abhishekvanaras -p ${dockerCredential}'
+                   withCredentials([string(credentialsId: 'dockerpassword', variable: 'dockerpassword')]) {
+                   bat 'docker login -u abhishekvanaras -p ${dockerpassword}'
                    }
                 }
             }
