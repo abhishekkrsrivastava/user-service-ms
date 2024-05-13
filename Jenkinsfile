@@ -39,7 +39,7 @@ pipeline{
             steps{
                 script{
                    withCredentials([string(credentialsId: 'dockerpassword', variable: 'dockerpassword')]) {
-                   bat 'docker login -u abhishekvanaras -p ${dockerpassword}'
+                   bat 'docker login -u abhishekvanaras -p %dockerpassword%'
                    }
                 }
             }
