@@ -5,7 +5,13 @@ pipeline{
     tools{
         maven "maven"
     }
-
+    environment{
+         APP_NAME= "user-service"
+         RELEASE= "1.0.0"
+         DOCKER_USER= "abhishekvanaras"
+         IMAGE_NAME= "${DOCKER_USER}"+"/"+"${APP_NAME}"
+         IMAGE_TAG= "${RELEASE}-${BUILD_NUMBER}"
+    }
     stages{
 
         stage("SCM Checkout"){
@@ -24,14 +30,14 @@ pipeline{
         stage("Build Docker Image"){
             steps{
                 script{
-                    bat 'docker build -t user-service-ms:1.2 .'
+                    bat 'docker build -t %APP_NAME%:%IMAGE_TAG% .'
                 }
             }
         }
         stage("Tag the Image"){
             steps{
                 script{
-                    bat 'docker tag user-service-ms:1.2 abhishekvanaras/user-service:1.4'
+                    bat 'docker tag %APP_NAME%:%IMAGE_TAG% %DOCKER_USER%/%APP_NAME%:%IMAGE_TAG%'
                 }
             }
         }
@@ -47,7 +53,7 @@ pipeline{
         stage("Docker Push"){
             steps{
                 script{
-                    bat 'docker push abhishekvanaras/user-service:1.4'
+                    bat 'docker push %DOCKER_USER%/%APP_NAME%:%IMAGE_TAG%'
                 }
             }
         }
@@ -58,11 +64,11 @@ pipeline{
         always{
            emailext attachLog: true, body: '''<html>
 <body>
-<p> Build Status: ${BUILD_STATUS}</p>
-<p> Build Number: ${BUILD_NUMBER}</p>
-<p> Check the <a href="${BUILD_URL}"> Console Output</a></p>
+<p> Build Status: %BUILD_STATUS%</p>
+<p> Build Number: %BUILD_NUMBER%</p>
+<p> Check the <a href="%BUILD_URL%"> Console Output</a></p>
 </html>
-</body>''', mimeType: 'text/html', replyTo: 'abhishekvanaras@gmail.com', subject: 'PipeLine Status: ${BUILD_NUMBER}', to: 'abhishekvanaras@gmail.com'
+</body>''', mimeType: 'text/html', replyTo: 'abhishekvanaras@gmail.com', subject: 'PipeLine Status: %BUILD_NUMBER%', to: 'abhishekvanaras@gmail.com'
         }
     }
 }
