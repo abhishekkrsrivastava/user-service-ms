@@ -1,23 +1,35 @@
 version: '3.8'
 
 services:
+  eureka-server:
+    image: eureka-server-ms:0.1
+    ports:
+      - "8761:8761"
+    networks:
+      - eureka-network
+    environment:
+      - EUREKA_INSTANCE_HOSTNAME=eureka-server
+      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
+      - EUREKA_CLIENT_FETCH_REGISTRY=false
+
   mysql-db:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: test1234
       MYSQL_DATABASE: user_schema
-
     ports:
       - '3307:3306'
     volumes:
       - /data/mysql
     container_name: user-service-db
+    networks:
+      - eureka-network
 
   application:
     build:
       context: .
       dockerfile: Dockerfile
-    image: user-service-ms:1.1
+    image: user-service-ms:1.82
     depends_on:
       - mysql-db
       - eureka-server
@@ -26,9 +38,15 @@ services:
     volumes:
       - /data/user-service-ms
     container_name: user-service-ms
-
+    networks:
+      - eureka-network
     environment:
       SPRING_DATASOURCE_URL: 'jdbc:mysql://mysql-db:3306/user_schema?allowPublicKeyRetrieval=true&useSSL=false'
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: test1234
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://localhost:8761/eureka
+      SPRING_APPLICATION_NAME: user-service-ms
 
+networks:
+  eureka-network:
+    driver: bridge
